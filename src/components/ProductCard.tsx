@@ -1,11 +1,14 @@
 "use client";
+import useCartStore from "@/app/stores/cartStore";
 import { ProductType } from "@/types";
 import { ShoppingCart } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { toast } from "react-toastify";
 
 const ProductCard = ({ product }: { product: ProductType }) => {
+  const { addToCart } = useCartStore();
   const [productTypes, setProductTypes] = useState<{
     size: string;
     color: string;
@@ -26,6 +29,17 @@ const ProductCard = ({ product }: { product: ProductType }) => {
       [type]: value,
     }));
   };
+
+
+  const handleAddtoCart = () => {
+    addToCart({
+      ...product,
+      quantity: 1,
+      selectedColor: productTypes.color,
+      selectedSize: productTypes.size
+    })
+    toast.success("Product added to cart!")
+  }
   return (
     <div className="rounded-lg overflow-hidden shadow-lg">
       {/* Image */}
@@ -69,7 +83,11 @@ const ProductCard = ({ product }: { product: ProductType }) => {
             <div className="flex items-center gap-2">
               {product.colors.map((color) => (
                 <div
-                    className={`cursor-pointer border-1 ${productTypes.color === color ? 'border-gray-400' : 'border-gray-200'} rounded-full p-[1px] justify-center items-center`}
+                  className={`cursor-pointer border-1 ${
+                    productTypes.color === color
+                      ? "border-gray-400"
+                      : "border-gray-200"
+                  } rounded-full p-[1px] justify-center items-center`}
                   key={color}
                   onClick={(e) =>
                     handleProductType({ type: "color", value: color })
@@ -87,7 +105,10 @@ const ProductCard = ({ product }: { product: ProductType }) => {
         {/* PRICE AND ADD TO CART BUTTON */}
         <div className="flex items-center justify-between">
           <p className="font-medium">${product.price}</p>
-          <button className="ring ring-gray-200 text-sm px-2 py-1 rounded-md cursor-pointer hover:text-white hover:bg-black transition-all duration-300 flex items-center gap-2">
+          <button
+            onClick={handleAddtoCart}
+            className="ring ring-gray-200 text-sm px-2 py-1 rounded-md cursor-pointer hover:text-white hover:bg-black transition-all duration-300 flex items-center gap-2"
+          >
             <ShoppingCart className="w-4 h-4" />
             Add to cart
           </button>
